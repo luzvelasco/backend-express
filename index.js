@@ -37,71 +37,7 @@ app.get('/',(req, res) => {
     res.send("Bienvenidos al servidor")
 })
 
-// ------------------------------------------------------ GETS ----------------------------------------------------------
-
-/**
- * @swagger
- * /florerias:
- *  get:
- *      summary: Listado de Florerias
- *      tags: [Florerias]
- *      responses:
- *          200:
- *              description: Muestra la lista de florerias
- */ 
-
-// ------------------------------------------------- BUSQUEDA POR ID -----------------------------------------------------
-
-/**
- * @swagger
- * /florerias/{id}:
- *  get:
- *      summary: Detalle de Floreria
- *      tags: [Florerias]
- *      parameters:
- *          - name: id
- *            in: path
- *            description: ID de la floreria
- *            required: true
- *      responses:
- *          200:
- *              description: Muestra detalles de floreria
- *          400:
- *              description: Error al mostrar detalles
- */
-
-app.get('/florerias/:id',(req, res) => {
-    const idFloreria = parseInt(req.params.id)
-    bd.query("SELECT * FROM florerias WHERE idFlorerias=?",[idFloreria],(err,results) => {
-        if(err) {
-            res.status(400).send("Error al obtener la floreria" + err.stack)
-            return
-        }
-        res.json(results)
-    })
-})
-
-app.get('/florerias',(req, res) => {
-    bd.query('SELECT * FROM florerias', (err, results) => {
-        if(err) {
-            console.log("Error al ejecutar la consulta")
-            return;
-        }
-        res.json(results)
-    })
-})
-
-app.get('/productos',(req, res) => {
-    bd.query('SELECT * FROM productos', (err, results) => {
-        if(err) {
-            console.log("Error al ejecutar la consulta")
-            return;
-        }
-        res.json(results)
-    })
-})
-
-// ------------------------------------------ PROCESAR DATOS -----------------------------------------------------------------
+// ------------------------------------------ PROCESAR DATOS / schemas -----------------------------------------------------------------
 
 /**
  * @swagger
@@ -134,10 +70,174 @@ app.get('/productos',(req, res) => {
 
 /**
  * @swagger
+ * components:
+ *      schemas:
+ *          Producto:
+ *              type: object
+ *              required:
+ *                  - nombre
+ *                  - descripcion
+ *                  - precio
+ *                  - foto
+ *                  - floreria
+ *                  - categoria
+ *              properties:
+ *                  id:
+ *                      type: integer
+ *                      description: ID autoincrementable de la floreria
+ *                  nombre:
+ *                      type: string
+ *                      description: nombre del producto
+ *                  descripcion:
+ *                      type: string
+ *                      description: descripcion del producto
+ *                  precio:
+ *                      type: double
+ *                      description: precio del producto
+ *                  foto:
+ *                      type: string
+ *                      description: foto del producto
+ *                  floreria:
+ *                      type: integer
+ *                      description: floreria que vende el producto
+ *                  categoria:
+ *                      type: integer
+ *                      description: categoría del producto
+ *              example:
+ *                  nombre: "corona de flores"
+ *                  descripcion: "corona hecha con flores"
+ *                  precio: 200
+ *                  foto: corona.jpg
+ *                  floreria: 1
+ *                  categoria: 3
+ */
+
+// ----------------------------------------------------- TAGS -----------------------------------------------------------
+
+/**
+ * @swagger
  * tags:
  *      name: Florerias
  *      description: API del catálogo de florerias
- * /guardar:
+ */
+
+/**
+ * @swagger
+ * tags:
+ *      name: Productos
+ *      description: API del catálogo de productos
+ */
+
+// ------------------------------------------------------ GETS ----------------------------------------------------------
+
+/**
+ * @swagger
+ * /florerias:
+ *  get:
+ *      summary: Listado de Florerias
+ *      tags: [Florerias]
+ *      responses:
+ *          200:
+ *              description: Muestra la lista de florerias
+ */ 
+
+/**
+ * @swagger
+ * /productos:
+ *  get:
+ *      summary: Listado de productos
+ *      tags: [Productos]
+ *      responses:
+ *          200:
+ *              description: Muestra la lista de productos
+ */ 
+
+// ------------------------------------------------- BUSQUEDA POR ID -----------------------------------------------------
+
+/**
+ * @swagger
+ * /florerias/{id}:
+ *  get:
+ *      summary: Detalles de Floreria
+ *      tags: [Florerias]
+ *      parameters:
+ *          - name: id
+ *            in: path
+ *            description: ID de la floreria
+ *            required: true
+ *      responses:
+ *          200:
+ *              description: Muestra detalles de floreria
+ *          400:
+ *              description: Error al mostrar detalles
+ */
+
+/**
+ * @swagger
+ * /productos/{id}:
+ *  get:
+ *      summary: Detalles de producto
+ *      tags: [Productos]
+ *      parameters:
+ *          - name: id
+ *            in: path
+ *            description: ID del producto
+ *            required: true
+ *      responses:
+ *          200:
+ *              description: Muestra detalles del producto
+ *          400:
+ *              description: Error al mostrar detalles
+ */
+
+
+app.get('/florerias',(req, res) => {
+    bd.query('SELECT * FROM florerias', (err, results) => {
+        if(err) {
+            console.log("Error al ejecutar la consulta")
+            return;
+        }
+        res.json(results)
+    })
+})
+
+app.get('/productos',(req, res) => {
+    bd.query('SELECT * FROM productos', (err, results) => {
+        if(err) {
+            console.log("Error al ejecutar la consulta")
+            return;
+        }
+        res.json(results)
+    })
+})
+
+app.get('/florerias/:id',(req, res) => {
+    const idFloreria = parseInt(req.params.id)
+    bd.query("SELECT * FROM florerias WHERE idFlorerias=?",[idFloreria],(err,results) => {
+        if(err) {
+            res.status(400).send("Error al obtener la floreria" + err.stack)
+            return
+        }
+        res.json(results)
+    })
+})
+
+app.get('/productos/:id',(req, res) => {
+    const idProducto = parseInt(req.params.id)
+    bd.query("SELECT * FROM productos WHERE id_producto=?",[idProducto],(err,results) => {
+        if(err) {
+            res.status(400).send("Error al obtener el producto" + err.stack)
+            return
+        }
+        res.json(results)
+    })
+})
+
+// ------------------------------------------------------ GUARDAR POST -----------------------------------------------------------------------
+
+/**
+ * @swagger
+ * /guardarFloreria:
  *  post:
  *      summary: Crear florerias
  *      tags: [Florerias]
@@ -154,7 +254,26 @@ app.get('/productos',(req, res) => {
  *              description: Datos incompletos
  */
 
-app.post('/guardar', (req, res) => {
+/**
+ * @swagger
+ * /guardarProducto:
+ *  post:
+ *      summary: Crear producto
+ *      tags: [Productos]
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/Producto'
+ *      responses:
+ *          200: 
+ *              description: Guardar nuevo producto
+ *          400:
+ *              description: Datos incompletos
+ */
+
+app.post('/guardarFloreria', (req, res) => {
     const  {nombre, ubicacion, telefono} = req.body    // desconstrucción. obtiene los datos que se pasan como parametros
 
     // VALIDAR LOS DATOS
@@ -173,6 +292,28 @@ app.post('/guardar', (req, res) => {
             return;
         }
         res.status(201).send("Floreria creada")
+    })
+})
+
+app.post('/guardarProducto', (req, res) => {
+    const  {nombre, descripcion, precio, foto, floreria, categoria} = req.body    // desconstrucción. obtiene los datos que se pasan como parametros
+
+    // VALIDAR LOS DATOS
+    
+    if (!nombre || !descripcion || !precio || !foto || !floreria || !categoria ) {
+        return res.status(400).json({ error: "Todos los campos son obligatorios"});
+    }
+
+    // const datos = req.body;
+    // console.log(datos)
+
+    bd.query("INSERT INTO productos(nombre, descripcion, precio, foto, floreria, categoria) VALUES(?,?,?,?,?,?)",[nombre,descripcion,precio,foto,floreria,categoria],
+    (err, result) => {
+        if(err) {
+            res.status(400).send("Error al crear un producto")
+            return;
+        }
+        res.status(201).send("Producto creado")
     })
 })
 
@@ -202,6 +343,29 @@ app.post('/guardar', (req, res) => {
  *              description: No se edita la floreria
  */
 
+/**
+ * @swagger
+ * /productos/{id}:
+ *  put:
+ *      summary: Editar productos
+ *      tags: [Productos]
+ *      parameters:
+ *          - name: id
+ *            in: path
+ *            description: ID del producto
+ *            required: true
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/Producto'
+ *      responses:
+ *          200: 
+ *              description: Guardar nuevo producto
+ *          400:
+ *              description: No se edita el producto
+ */
 
 app.put('/florerias/:id', (req, res) => {
     const {nombre, ubicacion, telefono} = req.body
@@ -214,6 +378,21 @@ app.put('/florerias/:id', (req, res) => {
                 return;
             }
             res.send('Florerias actualizadas.');
+        }
+    );
+});
+
+app.put('/productos/:id', (req, res) => {
+    const {nombre, descripcion, precio, foto, floreria, categoria} = req.body
+    const idProducto = parseInt(req.params.id)
+    bd.query("UPDATE productos SET nombre = ?, descripcion = ?, precio = ?, foto = ?, floreria = ?, categoria = ? WHERE id_producto = ?",
+        [nombre, descripcion, precio, foto, floreria, categoria, idProducto],
+        (err, result) => {
+            if (err) {
+                res.status(400).send("Error al editar un producto.")
+                return;
+            }
+            res.send('Productos actualizados.');
         }
     );
 });
@@ -238,6 +417,24 @@ app.put('/florerias/:id', (req, res) => {
  *              description: Error al eliminar floreria
  */
 
+/**
+ * @swagger
+ * /productos/{id}:
+ *  delete:
+ *      summary: Eliminacion de producto
+ *      tags: [Productos]
+ *      parameters:
+ *          - name: id
+ *            in: path
+ *            description: ID del producto
+ *            required: true
+ *      responses:
+ *          200:
+ *              description: Elimina un producto
+ *          400:
+ *              description: Error al eliminar producto
+ */
+
 app.delete('/florerias/:id', (req, res) => {
     const idFloreria = parseInt(req.params.id)
     bd.query("DELETE FROM florerias WHERE idFlorerias = ?", [idFloreria], (err, result) => {
@@ -246,6 +443,17 @@ app.delete('/florerias/:id', (req, res) => {
             return;
         }
         res.send('Floreria eliminada correctamente')
+    })
+})
+
+app.delete('/productos/:id', (req, res) => {
+    const idProducto = parseInt(req.params.id)
+    bd.query("DELETE FROM productos WHERE id_producto = ?", [idProducto], (err, result) => {
+        if (err) {
+            res.status(400).send("Error al eliminar producto")
+            return;
+        }
+        res.send('Producto eliminado correctamente')
     })
 })
 
