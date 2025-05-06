@@ -9,6 +9,8 @@ const cors = require('cors') // alguien puede acceder al servidor
 const app = express()
 const port = 3000
 
+const multer = require('multer') // para la carga de archivos
+const carpeta_archivos = multer({dest:'fotos/'}) // carpeta donde se guardaran los archivos
 
 app.use(cors())
 app.use(express.json())
@@ -455,6 +457,14 @@ app.delete('/productos/:id', (req, res) => {
         }
         res.send('Producto eliminado correctamente')
     })
+})
+
+// ---------------------------------------------------- SUBIR FOTO --------------------------------------------------------------------
+app.post('/procesar-foto', carpeta_archivos.single('file'), (req, res) => {
+    if(!req.file) {
+        return res.status(400).send("No fue posible encontrar la foto")
+    }
+    res.send("Foto subida correctamente")
 })
 
 // ------------------------------------------- CONFIGURAR SWAGGER PARA LA DOC DE LAS API ----------------------------------------------
